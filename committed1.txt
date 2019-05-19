@@ -1,0 +1,57 @@
+testpost=# select * from users;
+ id |  name  |   fullname    | nickname
+----+--------+---------------+----------
+  1 | ann    | anna may      | annie
+  2 | daniel | daniel o'neil+| dan
+    |        |               |
+(2 rows)
+
+
+testpost=# BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED;
+BEGIN
+testpost=# UPDATE users SET nickname='D' WHERE name='daniel';
+UPDATE 1
+testpost=# select * from users;
+ id |  name  |   fullname    | nickname
+----+--------+---------------+----------
+  1 | ann    | anna may      | annie
+  2 | daniel | daniel o'neil+| D
+    |        |               |
+(2 rows)
+
+
+testpost=# commit;
+COMMIT
+
+testpost=# BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED;
+BEGIN
+testpost=# UPDATE users SET nickname='dio' WHERE name='daniel';
+UPDATE 1
+testpost=# select * from users;
+ id |  name  |   fullname    | nickname
+----+--------+---------------+----------
+  1 | ann    | anna may      | annie
+  2 | daniel | daniel o'neil+| dio
+    |        |               |
+(2 rows)
+
+
+testpost=# commit;
+COMMIT
+testpost=# select * from users;
+ id |  name  |   fullname    | nickname
+----+--------+---------------+----------
+  1 | ann    | anna may      | annie
+  2 | daniel | daniel o'neil+| dio
+    |        |               |
+(2 rows)
+
+
+testpost=# select * from users;
+ id | name | fullname | nickname
+----+------+----------+----------
+  1 | ann  | anna may | annie
+(1 row)
+
+
+testpost=#

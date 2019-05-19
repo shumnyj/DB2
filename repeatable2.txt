@@ -1,0 +1,41 @@
+testpost=# select * from users
+testpost-# ;
+ id | name | fullname | nickname
+----+------+----------+----------
+  1 | ann  | anna may | annie
+(1 row)
+
+
+testpost=# BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+BEGIN
+testpost=# select * from users where nickname='annie';
+ id | name | fullname | nickname
+----+------+----------+----------
+  1 | ann  | anna may | annie
+(1 row)
+--before change
+
+testpost=# select * from users where nickname='annie';
+ id | name | fullname | nickname
+----+------+----------+----------
+  1 | ann  | anna may | annie
+(1 row)
+--after change
+
+testpost=# select * from users where nickname='annie';
+ id | name | fullname | nickname
+----+------+----------+----------
+  1 | ann  | anna may | annie
+(1 row)
+--after another commit
+
+testpost=# commit
+testpost-# ;
+COMMIT
+testpost=# select * from users where nickname='annie';
+ id | name | fullname | nickname
+----+------+----------+----------
+(0 rows)
+
+
+testpost=#

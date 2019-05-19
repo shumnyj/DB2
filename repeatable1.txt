@@ -1,0 +1,22 @@
+testpost=# select * from users;
+ id | name | fullname | nickname
+----+------+----------+----------
+  1 | ann  | anna may | annie
+(1 row)
+
+
+testpost=# BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+BEGIN
+testpost=# update users set nickname='A'
+testpost-# ;
+UPDATE 1
+testpost=# select * from users;
+ id | name | fullname | nickname
+----+------+----------+----------
+  1 | ann  | anna may | A
+(1 row)
+
+
+testpost=# commit;
+COMMIT
+testpost=#
