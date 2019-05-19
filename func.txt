@@ -1,0 +1,48 @@
+
+CREATE OR REPLACE FUNCTION pubauth() RETURNS TRIGGER AS
+$$
+DECLARE
+    au authors%rowtype;
+	n integer;
+	b integer;
+BEGIN
+	n = floor(random() * 5 + 1)::int;
+    WHILE n>0 LOOP
+        IF (n % 2) <> 0 THEN
+			b = floor(random() * 20 + 3)::int;
+		ELSE 
+			b = 0;
+		END IF;
+		INSERT INTO authors(fname,sname,exp, written, publisher) 
+		VALUES (n::text||'fname'||NEW.pname, n::text||'sname'||NEW.pname, 1, b, NEW.pname);
+		n = n-1;
+    END LOOP;
+    RETURN NEW;
+END
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER pubtrig AFTER INSERT on publishers 
+FOR EACH ROW EXECUTE PROCEDURE pubauth(); 
+
+
+CREATE OR REPLACE FUNCTION yreport(fn varchar(32), sn varchar(32), pb varchar(64)) RETURNS integer AS
+$$
+DECLARE
+    bk books%rowtype;
+	n integer;
+BEGIN
+	n=0;
+	FOR bk in SELECT * FROM books WHERE author_fname=fn AND author_sname=sn
+	LOOP
+		IF bk.pub = pb THEN
+			n=n+1;
+		END IF;	
+    END LOOP;
+	IF n = 0 AND ((SELECT publisher FROM authors WHERE fname =fn AND sname = sn) = pb) THEN
+		UPDATE authors SET publisher = NULL WHERE fname = fn AND sname = sn;
+	END IF;
+    RETURN n;
+END
+$$
+LANGUAGE plpgsql
